@@ -3,7 +3,7 @@
 This code is for checking values of sensor values of:
 
 Gravity: Analog Turbidity Sensor SKU:SEN0189
-Gravity: Analog pH Sensor SKU: SEN0161
+Gravity: Analog pH Sensor SKU:SEN0161
 DS18B20 Digital Temperature Sensor SKU:DFR0198
 
 Then using it to print out the values both in console and
@@ -65,7 +65,7 @@ void loop() {
   // Loops through to continually get the values of all sensors
   // and then prints it in both console and LCD screen
 
-  // Get ntu value of liquid
+  // Get NTU value of liquid
   float ntu = getTurbidity();
   // Get temperature of liquid
   float temperature = getTemp();
@@ -90,18 +90,18 @@ void loop() {
 
 
 float getTurbidity() {
-  // Code for turbidity sensor
+  // Code for reading voltage of turbidity sensor and converting it to ntu
 
   int sensorValue = analogRead(TURB_PIN);// read the input on analog pin 0:
   float voltage = sensorValue * (5.0 / 1024.0); // Convert the analog reading (which goes from 0 - 1023) to a voltage (0 - 5V):
-  float ntu = -1120.4*square(voltage)+5742.3*voltage-4352.9;
+  float ntu = -1120.4*sq(voltage)+5742.3*voltage-4352.9;
 
-  return voltage;
+  return ntu;
 }
 
 
 float getpH(float temperature){
-  // Code for pH sensor with temperature compensation
+  // Code for returning value from pH sensor with temperature compensation
 
   voltage = analogRead(PH_PIN)/1024.0*5000;  // read values from sensor and convert it to voltage
   phValue = ph.readPH(voltage,temperature);  // convert voltage to pH with temperature compensation
@@ -113,7 +113,7 @@ float getpH(float temperature){
 
 
 float getTemp(){
-  //returns the temperature from one DS18S20 in DEG Celsius
+  // Returns the temperature from one DS18S20 in DEG Celsius
 
   byte data[12];
   byte addr[8];
@@ -160,6 +160,10 @@ float getTemp(){
 
 
 void PrintOnScreen(float temp, float pH, float ntu){
+  /* Prints out temperature, pH, NTU and
+     if the water is safe to drink or not on an
+     LCD screen, based on the pH                */
+
   lcd.backlight();
   bool Cleared = true;
 
@@ -167,23 +171,20 @@ void PrintOnScreen(float temp, float pH, float ntu){
   lcd.print("Temp:         ");
   lcd.setCursor(9,0);
   lcd.print(temp);
-  //lcd.setCursor(13,0);
   lcd.print("C");
   lcd.setCursor(2,1);
   lcd.print("pH:");
-  //lcd.setCursor(8,1);
   lcd.print(pH);
-  //lcd.setCursor(13,1);
   lcd.print(" NTU:");
   lcd.print(ntu);
   lcd.setCursor(6,2);
   lcd.print("Water is");
   if(6.5 < pH && pH < 9.5){
-    lcd.setCursor(2,3);
-    lcd.print("    drinkable   ");
+    lcd.setCursor(0,3);
+    lcd.print("      drinkable   ");
   }
   else{
-    lcd.setCursor(2,3);
-    lcd.print("not drinkable :(");
+    lcd.setCursor(0,3);
+    lcd.print("  not drinkable :(");
   }
 }
